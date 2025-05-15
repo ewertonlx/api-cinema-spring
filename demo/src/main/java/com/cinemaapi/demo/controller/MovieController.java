@@ -54,9 +54,13 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createMovie(@RequestBody Movie movie){
-        service.createMovie(movie);
-        return ResponseEntity.status(HttpStatusCode.valueOf(201)).build();    
+    public ResponseEntity<String> createMovie(@RequestBody Movie movie){
+        try {
+            service.createMovie(movie);
+            return ResponseEntity.status(HttpStatusCode.valueOf(201)).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }  
     }
 
     @PutMapping("/{id}")
@@ -66,8 +70,12 @@ public class MovieController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMovie(@PathVariable int id){
-        service.deleteMovie(id);
-        return ResponseEntity.status(HttpStatusCode.valueOf(204)).build();
+    public ResponseEntity<String> deleteMovie(@PathVariable int id){
+        try {
+            service.deleteMovie(id);
+            return ResponseEntity.status(HttpStatusCode.valueOf(204)).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

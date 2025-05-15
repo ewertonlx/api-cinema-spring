@@ -1,5 +1,6 @@
 package com.cinemaapi.demo.services;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -18,6 +19,16 @@ public class MovieService {
     
 
     public void createMovie(Movie movie){
+        if(movie.getName() == null || movie.getName().isEmpty()
+        || movie.getDescription() == null || movie.getDescription().isEmpty()
+        || movie.getDirector() == null || movie.getDirector().isEmpty()
+        || movie.getCategories() == null || movie.getCategories().isEmpty()
+        ){
+            throw new RuntimeException("Preencha todos os campos!");
+        }
+        if(movie.getYear() < 1800 || movie.getYear() > Calendar.getInstance().get(Calendar.YEAR)){
+            throw new RuntimeException("O ano deve ser entre 1800 e o ano atual!");
+        }
         repository.save(movie);
     }
 
@@ -28,12 +39,15 @@ public class MovieService {
         var movie4 = new Movie("Rapaz, tá certo isso?", "Meme famoso na net", 2014, "Influencer", List.of(MovieCategory.TERROR, MovieCategory.ROMANCE));
         var movie5 = new Movie("Bora biu", "Bora fi do biu", 2020, "Biu", List.of(MovieCategory.COMEDIA));
         
-        Feedback feedback1 = new Feedback("TiodoZap", "Filme top!", 5, movie1);
-        Feedback feedback2 = new Feedback("SoVejoDublado", "Muito emocionante.", 4, movie2);
+        Feedback feedback1 = new Feedback("Tio do Zap", "Filme top!", 5, movie1);
+        Feedback feedback2 = new Feedback("Avestruz que te seduz", "Filme daora galera!", 5, movie1);
+        Feedback feedback3 = new Feedback("So Vejo Dublado", "Muito emocionante.", 4, movie2);
         movie1.addFeedback(feedback1);
+        movie1.addFeedback(feedback2);
         feedback1.setMovie(movie1);
-        movie2.addFeedback(feedback2);
-        feedback2.setMovie(movie2);
+        feedback2.setMovie(movie1);
+        movie2.addFeedback(feedback3);
+        feedback3.setMovie(movie2);
 
         repository.save(movie1);
         repository.save(movie2);
@@ -82,9 +96,10 @@ public class MovieService {
 
     public void deleteMovie(int id){
         var movieEntity = getMovieById(id);
-        if(movieEntity != null){
-            repository.delete(movieEntity);
+        if(movieEntity == null){
+            throw new RuntimeException("Filme não encontrado!");
         }
+        repository.delete(movieEntity);
     }
 
 }
