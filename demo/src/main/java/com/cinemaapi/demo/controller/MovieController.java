@@ -3,6 +3,7 @@ package com.cinemaapi.demo.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cinemaapi.demo.dto.MovieDTO;
 import com.cinemaapi.demo.entity.Movie;
 import com.cinemaapi.demo.entity.MovieCategory;
 import com.cinemaapi.demo.services.MovieService;
@@ -29,13 +30,13 @@ public class MovieController {
     }
     
     @GetMapping("/all")
-    public ResponseEntity<List<Movie>> getAllMovies() {
+    public ResponseEntity<List<MovieDTO>> getAllMovies() {
         var movies = service.getAllMovies();
         return ResponseEntity.ok(movies);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Movie> getMovieById(@PathVariable int id){
+    public ResponseEntity<MovieDTO> getMovieById(@PathVariable int id){
         var movie = service.getMovieById(id);
         if(movie == null){
             return ResponseEntity.notFound().build();
@@ -44,7 +45,7 @@ public class MovieController {
     }
 
     @GetMapping("/categoria/{category}")
-    public ResponseEntity<List<Movie>> getMoviesByCategory(@PathVariable String category){
+    public ResponseEntity<List<MovieDTO>> getMoviesByCategory(@PathVariable String category){
         var movieCategory = MovieCategory.valueOf(category.toUpperCase());
         var movies = service.getMoviesByCategory(movieCategory);
         if(movies.isEmpty()){
@@ -54,28 +55,20 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createMovie(@RequestBody Movie movie){
-        try {
-            service.createMovie(movie);
-            return ResponseEntity.status(HttpStatusCode.valueOf(201)).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }  
+    public ResponseEntity<Void> createMovie(@RequestBody Movie movie){
+        service.createMovie(movie);
+        return ResponseEntity.status(HttpStatusCode.valueOf(201)).build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateMovie(@PathVariable int id, @RequestBody Movie movie){
+    public ResponseEntity<Void> updateMovie(@PathVariable int id, @RequestBody MovieDTO movie){
         service.updateMovie(id, movie);
         return ResponseEntity.status(HttpStatusCode.valueOf(204)).build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteMovie(@PathVariable int id){
-        try {
-            service.deleteMovie(id);
-            return ResponseEntity.status(HttpStatusCode.valueOf(204)).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<Void> deleteMovie(@PathVariable int id){
+        service.deleteMovie(id);
+        return ResponseEntity.status(HttpStatusCode.valueOf(204)).build();
     }
 }

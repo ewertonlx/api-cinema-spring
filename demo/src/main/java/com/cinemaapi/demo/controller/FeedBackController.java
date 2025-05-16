@@ -5,15 +5,13 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.cinemaapi.demo.entity.Feedback;
+import com.cinemaapi.demo.dto.FeedBackDTO;
 import com.cinemaapi.demo.services.FeedBackService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
-
-
 
 @RestController
 @RequestMapping("/feedbacks")
@@ -25,32 +23,20 @@ public class FeedBackController {
     }
 
     @GetMapping("/filme/{id}")
-    public ResponseEntity<List<Feedback>> getFeedbacks(@PathVariable int id){
-        try {
-            var feedbacks = feedbackService.getMovieFeedbacks(id);
-            return ResponseEntity.ok(feedbacks);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public ResponseEntity<List<FeedBackDTO>> getFeedbacks(@PathVariable int id){
+        var feedbacks = feedbackService.getMovieFeedbacks(id);
+        return ResponseEntity.ok(feedbacks);
     }
     
     @PostMapping("/filme/{id}")
-    public ResponseEntity<String> addFeedbackToMovie(@PathVariable int id, @RequestBody Feedback feedback) {
-        try {
-            feedbackService.addFeedbackToMovie(id, feedback);
-            return ResponseEntity.status(201).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<Void> addFeedbackToMovie(@PathVariable int id, @RequestBody FeedBackDTO feedback) {
+        feedbackService.addFeedbackToMovie(id, feedback);
+        return ResponseEntity.status(201).build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateFeedback(@PathVariable int id, @RequestBody Feedback feedback) {
-        try {
-            feedbackService.updateFeedback(id, feedback);
-            return ResponseEntity.status(204).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<Void> updateFeedback(@PathVariable int id, @RequestBody FeedBackDTO feedback) {
+        feedbackService.updateFeedback(id, feedback);
+        return ResponseEntity.status(204).build();
     }
 }
