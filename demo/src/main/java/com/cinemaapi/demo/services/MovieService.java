@@ -1,13 +1,15 @@
 package com.cinemaapi.demo.services;
 
-import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.cinemaapi.demo.dto.MovieDTO;
+import com.cinemaapi.demo.dto.FeedBackDTO;
 import com.cinemaapi.demo.entity.Feedback;
 import com.cinemaapi.demo.entity.Movie;
 import com.cinemaapi.demo.entity.MovieCategory;
+import com.cinemaapi.demo.exception.NotFoundException;
 import com.cinemaapi.demo.repository.MovieRepository;
 
 @Service
@@ -17,18 +19,7 @@ public class MovieService {
         this.repository = repository;
     }
     
-
     public void createMovie(Movie movie){
-        if(movie.getName() == null || movie.getName().isEmpty()
-        || movie.getDescription() == null || movie.getDescription().isEmpty()
-        || movie.getDirector() == null || movie.getDirector().isEmpty()
-        || movie.getCategories() == null || movie.getCategories().isEmpty()
-        ){
-            throw new RuntimeException("Preencha todos os campos!");
-        }
-        if(movie.getYear() < 1800 || movie.getYear() > Calendar.getInstance().get(Calendar.YEAR)){
-            throw new RuntimeException("O ano deve ser entre 1800 e o ano atual!");
-        }
         repository.save(movie);
     }
 
@@ -55,50 +46,76 @@ public class MovieService {
         repository.save(movie4);
         repository.save(movie5);
     }
-    public List<Movie> getAllMovies(){
-        return repository.findAll();
+    public List<MovieDTO> getAllMovies() {
+    return repository.findAll().stream()
+        .map(movie -> new MovieDTO(
+            movie.getName(),
+            movie.getDescription(),
+            movie.getYear(),
+            movie.getDirector(),
+            movie.getCategories(), // List<MovieCategory>
+            movie.getFeedbacks().stream()
+                .map(f -> new FeedBackDTO(f.getUsername(), f.getComment(), f.getRating()))
+                .toList()
+        ))
+        .toList();
+}
+
+    public MovieDTO getMovieById(int id){
+        return repository.findById(id)
+        .map(m -> new MovieDTO(m.getName(), m.getDescription(), m.getYear(), m.getDirector(), m.getCategories(), 
+        m.getFeedbacks().stream().map(f -> new FeedBackDTO(f.getUsername(), f.getComment(), f.getRating())).toList()))
+        .orElseThrow(() -> new NotFoundException("Filme não encontrado!"));
     }
 
-    public Movie getMovieById(int id){
-        return repository.findById(id).orElse(null);
+   public List<MovieDTO> getMoviesByCategory(MovieCategory category) {
+    if (category == null) {
+        throw new RuntimeException("Categoria inválida!");
     }
 
-    public List<Movie> getMoviesByCategory(MovieCategory category){
-        return repository.findAll().stream()
-            .filter(movie -> movie.getCategories().contains(category))
-            .toList();
-    }
+    var movies = repository.findAll().stream()
+        .filter(movie -> movie.getCategories().contains(category))
+        .map(movie -> new MovieDTO(
+            movie.getName(),
+            movie.getDescription(),
+            movie.getYear(),
+            movie.getDirector(),
+            movie.getCategories(),
+            movie.getFeedbacks().stream()
+                .map(f -> new FeedBackDTO(f.getUsername(), f.getComment(), f.getRating()))
+                .toList()
+        ))
+        .toList();
 
-    public void updateMovie(int id, Movie movie){
-        var movieEntity = getMovieById(id);
-        if(movieEntity != null){
-            if(movie.getName() != null){
-                movieEntity.setName(movie.getName());
-            }
-            if(movie.getDescription() != null){
-                movieEntity.setDescription(movie.getDescription());
-            }
-            if(movie.getYear() != 0){
-                movieEntity.setYear(movie.getYear());
-            }
-            if(movie.getDirector() != null){
-                movieEntity.setDirector(movie.getDirector());
-            }
-            if (movie.getCategories() != null && !movie.getCategories().isEmpty()) {
-                movieEntity.getCategories().clear();
-                for (MovieCategory category : movie.getCategories()) {
-                    movieEntity.setCategory(category);
-                }
-            }
-            repository.save(movieEntity);
+    return movies;
+}
+
+    public void updateMovie(int id, MovieDTO movie){
+        var movieEntity = repository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Filme não encontrado!"));
+        if(movie.name() != null){
+            movieEntity.setName(movie.name());
         }
+        if(movie.description() != null){
+            movieEntity.setDescription(movie.description());
+        }
+        if(movie.year() != 0){
+            movieEntity.setYear(movie.year());
+        }
+        if(movie.director() != null){
+            movieEntity.setDirector(movie.director());
+        }
+        if(movie.categories() != null){
+            movieEntity.getCategories().clear();
+            movieEntity.getCategories().addAll(movie.categories());
+        }
+
+        repository.save(movieEntity);
     }
 
     public void deleteMovie(int id){
-        var movieEntity = getMovieById(id);
-        if(movieEntity == null){
-            throw new RuntimeException("Filme não encontrado!");
-        }
+        Movie movieEntity = repository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Filme não encontrado!"));
         repository.delete(movieEntity);
     }
 
