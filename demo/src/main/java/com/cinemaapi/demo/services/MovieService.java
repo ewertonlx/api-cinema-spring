@@ -15,14 +15,30 @@ import com.cinemaapi.demo.repository.MovieRepository;
 @Service
 public class MovieService {
     private final MovieRepository repository;
+
+    // Injeção de dependência do MovieRepository.
     public MovieService(MovieRepository repository) {
         this.repository = repository;
     }
-    
-    public void createMovie(Movie movie){
+
+    // Função para converter o record MovieDTO para classe Movie.
+    private Movie convertToEntity(MovieDTO dto) {
+        Movie movie = new Movie();
+        movie.setName(dto.name());
+        movie.setDescription(dto.description());
+        movie.setYear(dto.year());
+        movie.setDirector(dto.director());
+        movie.getCategories().addAll(dto.categories());
+        return movie;
+    }
+
+    // Serviço para criar um novo filme.
+    public void createMovie(MovieDTO movieDTO){
+        Movie movie = convertToEntity(movieDTO);
         repository.save(movie);
     }
 
+    // Serviço para criar filmes padrões assim que o projeto iniciar.
     public void createMovies(){
         var movie1 = new Movie("Filme legal 1", "Um filme muito legal", 2025, "Diretor legal", List.of(MovieCategory.ACAO, MovieCategory.COMEDIA));
         var movie2 = new Movie("Filme divertido", "Se divirta assistindo", 2000, "Diretor divertido", List.of(MovieCategory.DRAMA, MovieCategory.FANTASIA));
@@ -46,21 +62,23 @@ public class MovieService {
         repository.save(movie4);
         repository.save(movie5);
     }
-    public List<MovieDTO> getAllMovies() {
-    return repository.findAll().stream()
-        .map(movie -> new MovieDTO(
-            movie.getName(),
-            movie.getDescription(),
-            movie.getYear(),
-            movie.getDirector(),
-            movie.getCategories(), // List<MovieCategory>
-            movie.getFeedbacks().stream()
-                .map(f -> new FeedBackDTO(f.getUsername(), f.getComment(), f.getRating()))
-                .toList()
-        ))
-        .toList();
-}
 
+    // Serviço que retorna todos os filmes existentes.
+    public List<MovieDTO> getAllMovies() {
+        return repository.findAll().stream()
+            .map(movie -> new MovieDTO(
+                movie.getName(),
+                movie.getDescription(),
+                movie.getYear(),
+                movie.getDirector(),
+                movie.getCategories(),
+                movie.getFeedbacks().stream()
+                    .map(f -> new FeedBackDTO(f.getUsername(), f.getComment(), f.getRating()))
+                    .toList()
+            )).toList();
+    }
+
+    // Serviço que busca um filme pelo ID.
     public MovieDTO getMovieById(int id){
         return repository.findById(id)
         .map(m -> new MovieDTO(m.getName(), m.getDescription(), m.getYear(), m.getDirector(), m.getCategories(), 
@@ -68,28 +86,29 @@ public class MovieService {
         .orElseThrow(() -> new NotFoundException("Filme não encontrado!"));
     }
 
-   public List<MovieDTO> getMoviesByCategory(MovieCategory category) {
-    if (category == null) {
-        throw new RuntimeException("Categoria inválida!");
+    // Serviço que filtra os filmes pelo nome da categoria.
+    public List<MovieDTO> getMoviesByCategory(MovieCategory category) {
+        if (category == null) {
+            throw new RuntimeException("Categoria inválida!");
+        }
+
+        var movies = repository.findAll().stream()
+            .filter(movie -> movie.getCategories().contains(category))
+            .map(movie -> new MovieDTO(
+                movie.getName(),
+                movie.getDescription(),
+                movie.getYear(),
+                movie.getDirector(),
+                movie.getCategories(),
+                movie.getFeedbacks().stream()
+                    .map(f -> new FeedBackDTO(f.getUsername(), f.getComment(), f.getRating()))
+                    .toList()
+            )).toList();
+
+        return movies;
     }
 
-    var movies = repository.findAll().stream()
-        .filter(movie -> movie.getCategories().contains(category))
-        .map(movie -> new MovieDTO(
-            movie.getName(),
-            movie.getDescription(),
-            movie.getYear(),
-            movie.getDirector(),
-            movie.getCategories(),
-            movie.getFeedbacks().stream()
-                .map(f -> new FeedBackDTO(f.getUsername(), f.getComment(), f.getRating()))
-                .toList()
-        ))
-        .toList();
-
-    return movies;
-}
-
+    // Serviço que busca um filme pelo ID e faz as devidas alterações.
     public void updateMovie(int id, MovieDTO movie){
         var movieEntity = repository.findById(id)
             .orElseThrow(() -> new NotFoundException("Filme não encontrado!"));
@@ -113,6 +132,7 @@ public class MovieService {
         repository.save(movieEntity);
     }
 
+    // Serviço que busca um filme pelo ID e faz o delete dele na database.
     public void deleteMovie(int id){
         Movie movieEntity = repository.findById(id)
             .orElseThrow(() -> new NotFoundException("Filme não encontrado!"));

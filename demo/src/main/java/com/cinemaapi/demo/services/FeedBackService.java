@@ -15,11 +15,13 @@ public class FeedBackService {
     private final FeedBackRepository feedbackRepository;
     private final MovieRepository movieRepository;
 
+    // Injeção de dependência do FeedbackRepository e MovieRepository.
     public FeedBackService(FeedBackRepository feedbackRepository, MovieRepository movieRepository) {
         this.feedbackRepository = feedbackRepository;
         this.movieRepository = movieRepository;
     }
 
+    // Serviço que busca um filme pelo ID e adiciona um novo feedback a ele.
     public FeedBackDTO addFeedbackToMovie(int movieId, FeedBackDTO feedback) {
         var movie = movieRepository.findById(movieId).orElseThrow(() -> new NotFoundException("Filme não encontrado!"));
         Feedback feedbackEntity = new Feedback(feedback.username(), feedback.comment(), feedback.rating(), movie);
@@ -27,8 +29,9 @@ public class FeedBackService {
         return new FeedBackDTO(savedFeedback.getUsername(), savedFeedback.getComment(), savedFeedback.getRating());
     }
 
-    public FeedBackDTO updateFeedback(int id, FeedBackDTO feedback) {
-        var existingFeedback = feedbackRepository.findById(id).orElseThrow(() -> new NotFoundException("Feedback não encontrado!"));
+    // Serviço que busca um feedback pelo ID e faz as devidas atualizações.
+    public FeedBackDTO updateFeedback(int movieId, FeedBackDTO feedback) {
+        var existingFeedback = feedbackRepository.findById(movieId).orElseThrow(() -> new NotFoundException("Feedback não encontrado!"));
 
         existingFeedback.setComment(feedback.getComment());
         existingFeedback.setRating(feedback.getRating());
@@ -36,8 +39,9 @@ public class FeedBackService {
         return new FeedBackDTO(updatedFeedback.getUsername(), updatedFeedback.getComment(), updatedFeedback.getRating());
     }
 
-    public List<FeedBackDTO> getMovieFeedbacks(int id) {
-        var movie = movieRepository.findById(id)
+    // Serviço que busca um filme pelo ID e retorna os feedbacks desse filme.
+    public List<FeedBackDTO> getMovieFeedbacks(int movieId) {
+        var movie = movieRepository.findById(movieId)
             .orElseThrow(() -> new NotFoundException("Filme não encontrado!"));
 
         return movie.getFeedbacks().stream()

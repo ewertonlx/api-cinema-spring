@@ -1,5 +1,6 @@
 package com.cinemaapi.demo.exception;
 
+// Resposta padrão para exceções lançadas: message, code.
 public class ExceptionResponse {
     String message;
     String code;
