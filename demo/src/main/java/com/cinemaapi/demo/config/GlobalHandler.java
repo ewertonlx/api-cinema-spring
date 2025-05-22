@@ -3,7 +3,6 @@ package com.cinemaapi.demo.config;
 import com.cinemaapi.demo.exception.ExceptionResponse;
 import com.cinemaapi.demo.exception.NotFoundException;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +36,8 @@ public class GlobalHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .toList();
 
-        errors.put("status", HttpStatus.BAD_REQUEST.value());
         errors.put("messages", errorMessages);
-        errors.put("timestamp", LocalDateTime.now());
+        errors.put("status", HttpStatus.BAD_REQUEST.value());
 
         return errors;
     }
