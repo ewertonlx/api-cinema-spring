@@ -163,3 +163,7 @@ Esse projeto tem como objetivo em adquirir conhecimento na utilização do Sprin
 🔻 **[DELETE]** -> /filmes/:id
 
 🛰️ Status: 204
+
+🔻 **[DELETE]** -> /feedbacks/:id
+
+🛰️ Status: 204
