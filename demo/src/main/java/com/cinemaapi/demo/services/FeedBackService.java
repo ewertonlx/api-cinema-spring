@@ -48,4 +48,11 @@ public class FeedBackService {
             .map(f -> new FeedBackDTO(f.getUsername(), f.getComment(), f.getRating()))
             .toList();
     }
+
+    // Serviço que busca um filme pelo ID e faz o delete dele na database.
+    public void deleteFeedback(int id) {
+        var feedback = feedbackRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Feedback não encontrado!"));
+        feedbackRepository.delete(feedback);
+    }
 }

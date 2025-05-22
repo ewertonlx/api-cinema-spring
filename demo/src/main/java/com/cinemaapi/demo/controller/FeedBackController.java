@@ -43,4 +43,10 @@ public class FeedBackController {
         feedbackService.updateFeedback(id, feedback);
         return ResponseEntity.status(204).build();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFeedback(@PathVariable int id) {
+        feedbackService.deleteFeedback(id);
+        return ResponseEntity.status(204).build();
+    }
 }
