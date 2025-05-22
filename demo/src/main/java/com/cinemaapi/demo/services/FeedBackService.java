@@ -33,8 +33,8 @@ public class FeedBackService {
     public FeedBackDTO updateFeedback(int movieId, FeedBackDTO feedback) {
         var existingFeedback = feedbackRepository.findById(movieId).orElseThrow(() -> new NotFoundException("Feedback não encontrado!"));
 
-        existingFeedback.setComment(feedback.getComment());
-        existingFeedback.setRating(feedback.getRating());
+        existingFeedback.setComment(feedback.comment());
+        existingFeedback.setRating(feedback.rating());
         Feedback updatedFeedback = feedbackRepository.save(existingFeedback);
         return new FeedBackDTO(updatedFeedback.getUsername(), updatedFeedback.getComment(), updatedFeedback.getRating());
     }

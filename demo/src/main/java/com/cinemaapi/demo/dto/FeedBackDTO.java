@@ -15,29 +15,4 @@ public record FeedBackDTO(
         @Min(value = 0, message = "Nota deve estar entre 0 e 5")
         @Max(value = 5, message = "Nota deve estar entre 0 e 5")
         int rating
-) {
-        
-    public String getUsername() {
-        return username;
-    }
-
-    public String setUsername(String username) {
-        return username;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public String setComment(String comment) {
-        return comment;
-    }
-
-    public int getRating() {
-        return rating;
-    }
-
-    public int setRating(int rating) {
-        return rating;
-    }
-}
+) {}
