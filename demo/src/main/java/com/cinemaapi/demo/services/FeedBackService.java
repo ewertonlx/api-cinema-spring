@@ -1,7 +1,7 @@
 package com.cinemaapi.demo.services;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.cinemaapi.demo.dto.FeedBackDTO;
@@ -40,13 +40,12 @@ public class FeedBackService {
     }
 
     // Serviço que busca um filme pelo ID e retorna os feedbacks desse filme.
-    public List<FeedBackDTO> getMovieFeedbacks(int movieId) {
-        var movie = movieRepository.findById(movieId)
+    public Page<FeedBackDTO> getMovieFeedbacks(int movieId, Pageable pageable) {
+        movieRepository.findById(movieId)
             .orElseThrow(() -> new NotFoundException("Filme não encontrado!"));
 
-        return movie.getFeedbacks().stream()
-            .map(f -> new FeedBackDTO(f.getUsername(), f.getComment(), f.getRating()))
-            .toList();
+        Page<Feedback> feedbacks = feedbackRepository.findByMovieId(movieId, pageable);
+        return feedbacks.map(f -> new FeedBackDTO(f.getUsername(), f.getComment(), f.getRating()));
     }
 
     // Serviço que busca um filme pelo ID e faz o delete dele na database.

@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,9 +36,8 @@ public class MovieController {
     
     // Rota GET para obter todos os filmes.
     @GetMapping("/all")
-    public ResponseEntity<List<MovieDTO>> getAllMovies() {
-        var movies = service.getAllMovies();
-        return ResponseEntity.ok(movies);
+    public ResponseEntity<Page<MovieDTO>> getAllMovies(Pageable pageable) {
+        return ResponseEntity.ok(service.getAllMovies(pageable));
     }
 
     // Rota GET para obter um filme específico pelo ID.

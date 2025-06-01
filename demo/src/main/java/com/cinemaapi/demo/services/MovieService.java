@@ -2,6 +2,8 @@ package com.cinemaapi.demo.services;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.cinemaapi.demo.dto.MovieDTO;
@@ -64,9 +66,13 @@ public class MovieService {
     }
 
     // Serviço que retorna todos os filmes existentes.
-    public List<MovieDTO> getAllMovies() {
-        return repository.findAll().stream()
-            .map(movie -> new MovieDTO(
+    public Page<MovieDTO> getAllMovies(Pageable pageable) {
+        return repository.findAll(pageable)
+        .map(this::getMovieResponse);
+    }
+
+    private MovieDTO getMovieResponse(Movie movie) {
+        return new MovieDTO(
                 movie.getName(),
                 movie.getDescription(),
                 movie.getYear(),
@@ -75,7 +81,7 @@ public class MovieService {
                 movie.getFeedbacks().stream()
                     .map(f -> new FeedBackDTO(f.getUsername(), f.getComment(), f.getRating()))
                     .toList()
-            )).toList();
+        );
     }
 
     // Serviço que busca um filme pelo ID.

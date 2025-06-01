@@ -1,7 +1,7 @@
 package com.cinemaapi.demo.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +27,8 @@ public class FeedBackController {
 
     // Rota GET para obter os feedbacks de determinado filme pelo ID.
     @GetMapping("/filme/{id}")
-    public ResponseEntity<List<FeedBackDTO>> getFeedbacks(@PathVariable int id){
-        var feedbacks = feedbackService.getMovieFeedbacks(id);
-        return ResponseEntity.ok(feedbacks);
+    public ResponseEntity<Page<FeedBackDTO>> getFeedbacks(@PathVariable int id, Pageable pageable) {
+        return ResponseEntity.ok(feedbackService.getMovieFeedbacks(id, pageable));
     }
     
     // Rota POST para adicionar um novo feedback a um filme.
