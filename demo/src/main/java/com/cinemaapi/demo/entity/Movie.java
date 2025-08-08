@@ -19,7 +19,6 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 public class Movie {
-    // Colunas para ser representadas na database.
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
@@ -34,14 +33,13 @@ public class Movie {
     @Column(name = "category")
     private List<MovieCategory> categories = new ArrayList<>();
     
-    // Relacionamento 1:N -> Um filme pode ter vários ou nenhum feedback.
     @OneToMany  (mappedBy = "movie", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Feedback> feedbacks = new ArrayList<>();
 
     public Movie() {
     }
-    public Movie(String name, String description, int year, String director, List<MovieCategory> categories ,List<Feedback> feedbacks) {
+    public Movie(String name, String description, int year, String director, List<MovieCategory> categories, List<Feedback> feedbacks) {
         this.name = name;
         this.description = description;
         this.year = year;

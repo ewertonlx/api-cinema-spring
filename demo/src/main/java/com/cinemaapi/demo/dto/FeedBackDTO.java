@@ -4,7 +4,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
-// DTO para representar a classe FeedBack.
 public record FeedBackDTO(
         @NotBlank(message = "Nome de usuário é obrigatório")
         String username,

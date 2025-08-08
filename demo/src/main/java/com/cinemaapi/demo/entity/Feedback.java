@@ -11,14 +11,13 @@ import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Feedback {
-    // Colunas para ser representadas na database.
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String username;
     private String comment;
     private int rating;
 
-    // Relacionamento N:1 -> Um ou vários feedbacks pertencem a um filme.
     @ManyToOne
     @JoinColumn(name = "movie_id")
     @JsonBackReference
